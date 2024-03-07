@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Day Information</title>
+  <style>
+    /* Add your CSS styles here */
+    /* You can style the layout as per your preference */
+  </style>
+</head>
+<body>
+  <h1>Open Day Information</h1>
+  <div id="openDayInfo"></div>
+  <div>
+    <label for="sortBy">Sort By:</label>
+    <select id="sortBy">
+      <option value="start_time">Start Time</option>
+      <option value="end_time">End Time</option>
+      <option value="type">Type</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="Search...">
+    <button onclick="sortAndDisplay()">Sort & Display</button>
+  </div>
+
+  <script>
+    // Function to fetch JSON data
+    async function fetchData() {
+      try {
+        const response = await fetch('C:\Users\dellg\Downloads\OpenDay.json');
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    // Function to display Open Day information
+    function displayOpenDayInfo(data) {
+      const openDayInfoElement = document.getElementById('openDayInfo');
+      openDayInfoElement.innerHTML = ''; // Clear previous content
+      data.forEach(event => {
+        const eventElement = document.createElement('div');
+        eventElement.innerHTML = `
+          <p><strong>Description:</strong> ${event.description}</p>
+          <p><strong>Start Time:</strong> ${event.start_time}</p>
+          <p><strong>End Time:</strong> ${event.end_time}</p>
+          <p><strong>Type:</strong> ${event.type}</p>
+          <p><strong>Active:</strong> ${event.active ? 'Yes' : 'No'}</p>
+          <hr>
+        `;
+        openDayInfoElement.appendChild(eventElement);
+      });
+    }
+
+    // Function to sort and display data
+    async function sortAndDisplay() {
+      const sortBy = document.getElementById('sortBy').value;
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      const data = await fetchData();
+      const sortedData = data.sort((a, b) => {
+        if (a[sortBy] < b[sortBy]) return -1;
+        if (a[sortBy] > b[sortBy]) return 1;
+        return 0;
+      });
+      const filteredData = sortedData.filter(event => event.description.toLowerCase().includes(searchQuery));
+      displayOpenDayInfo(filteredData);
+    }
+
+    // Initial display of Open Day information
+    sortAndDisplay();
+  </script>
+</body>
+</html>
